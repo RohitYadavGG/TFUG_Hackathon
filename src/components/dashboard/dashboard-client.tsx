@@ -82,9 +82,6 @@ export default function DashboardClient({
   }, []);
 
   const handleAnalyze = (locationId: string, isProactive = false) => {
-    if (!isProactive) {
-      setAnalyzingId(locationId);
-    }
     startTransition(async () => {
       const formData = new FormData();
       formData.append('locationId', locationId);
@@ -96,16 +93,22 @@ export default function DashboardClient({
         const { alert: newAlert, newPeopleCount } =
           await analyzeDensityAction(formData);
 
+        setLocations((prev) =>
+            prev.map((l) =>
+              l.id === locationId ? { ...l, currentPeople: newPeopleCount } : l
+            )
+        );
+
         const location = locations.find((l) => l.id === locationId);
 
         if (newAlert && location) {
           const timeToThreshold = newAlert.prediction?.timeToThreshold ?? -1;
           const isPredictive = timeToThreshold > 0;
 
-          // Update location state
+          // Update location state with predictive alert
           setLocations((prev) =>
             prev.map((l) =>
-              l.id === locationId ? { ...l, currentPeople: newPeopleCount, predictiveAlert: isPredictive ? newAlert : null } : l
+              l.id === locationId ? { ...l, predictiveAlert: isPredictive ? newAlert : null } : l
             )
           );
 
@@ -115,7 +118,7 @@ export default function DashboardClient({
 
           if (!isProactive) {
             if (newAlert.prediction?.series) {
-              setPredictionData({ location, alert: newAlert });
+              setPredictionData({ location: {...location, currentPeople: newPeopleCount}, alert: newAlert });
             }
             if (newAlert.severity !== 'low') {
               toast({
@@ -127,14 +130,16 @@ export default function DashboardClient({
           }
         }
       } catch (error) {
-        toast({
-          variant: 'destructive',
-          title: 'Analysis Failed',
-          description:
-            error instanceof Error
-              ? error.message
-              : 'An unknown error occurred.',
-        });
+        if (!isProactive) { // Only show toast for manual analysis
+            toast({
+            variant: 'destructive',
+            title: 'Analysis Failed',
+            description:
+                error instanceof Error
+                ? error.message
+                : 'An unknown error occurred.',
+            });
+        }
       } finally {
         if (!isProactive) {
           setAnalyzingId(null);
@@ -142,15 +147,22 @@ export default function DashboardClient({
       }
     });
   };
+  
+  const startManualAnalysis = (locationId: string) => {
+    setAnalyzingId(locationId);
+    handleAnalyze(locationId, false);
+  }
 
   // Effect for proactive monitoring
   useEffect(() => {
     if (isProactiveMonitoring) {
       monitoringIntervalRef.current = setInterval(() => {
-        const updatedLocations = simulatePeopleFlow(locations);
-        setLocations(updatedLocations);
-        updatedLocations.forEach((location) => {
-          handleAnalyze(location.id, true);
+        setLocations(currentLocations => {
+            const updatedLocations = simulatePeopleFlow(currentLocations);
+            updatedLocations.forEach((location) => {
+                handleAnalyze(location.id, true);
+            });
+            return updatedLocations;
         });
       }, 5000); // Check every 5 seconds
     } else {
@@ -166,7 +178,7 @@ export default function DashboardClient({
         clearInterval(monitoringIntervalRef.current);
       }
     };
-  }, [isProactiveMonitoring, locations]);
+  }, [isProactiveMonitoring]);
   
   // Effect for handling predictive alert audio
   useEffect(() => {
@@ -206,7 +218,7 @@ export default function DashboardClient({
           <div className="space-y-6 lg:col-span-2">
             <LocationGrid
               locations={locations}
-              onAnalyze={handleAnalyze}
+              onAnalyze={startManualAnalysis}
               isAnalyzing={isPending && !!analyzingId}
               analyzingId={analyzingId}
             />

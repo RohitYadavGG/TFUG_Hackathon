@@ -33,7 +33,7 @@ export async function analyzeDensityAction(
   }
 
   // In a real app, you would fetch the live people count.
-  // Here we'll simulate a slight increase for demonstration.
+  // For proactive, we use the value from the simulation. For manual, we simulate a jump.
   const currentPeople = isProactive
     ? location.currentPeople
     : Math.min(
@@ -68,9 +68,11 @@ export async function analyzeDensityAction(
   };
 
   const isPredictiveAlert = result.prediction.timeToThreshold > 0 && result.prediction.timeToThreshold <= 50;
+  const isOverThreshold = currentPeople > location.threshold;
 
-  // Save to Firestore for actual alerts (high/medium severity) or significant predictive alerts
-  if (newAlert.severity !== 'low' || isPredictiveAlert) {
+  // Save to Firestore for actual alerts (high/medium severity), significant predictive alerts,
+  // or if threshold is currently breached.
+  if (newAlert.severity !== 'low' || isPredictiveAlert || isOverThreshold) {
     const docRef = await addDoc(collection(db, 'crowd_alerts'), {
         ...newAlert,
         timestamp: serverTimestamp(),
