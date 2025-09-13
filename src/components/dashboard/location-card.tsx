@@ -108,7 +108,10 @@ export default function LocationCard({
                     <span>Threshold in {formatDuration(predictiveAlert.prediction.timeToThreshold * 60)}</span>
                 </div>
             ) : (
-                <RealTimeClock />
+                <div className="flex items-center justify-center gap-2">
+                    <Clock className="size-4" />
+                    <span>No imminent threat</span>
+                </div>
             )}
         </div>
       </CardFooter>

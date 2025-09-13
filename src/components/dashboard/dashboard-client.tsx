@@ -139,7 +139,7 @@ export default function DashboardClient({
           // Update location state with predictive alert
           setLocations((prev) =>
             prev.map((l) =>
-              l.id === locationId ? { ...l, predictiveAlert: isPredictive ? newAlert : null } : l
+              l.id === locationId ? { ...l, predictiveAlert: newAlert } : l
             )
           );
 
@@ -191,7 +191,7 @@ export default function DashboardClient({
             });
             return updatedLocations;
         });
-      }, 5000); // Check every 5 seconds
+      }, 5 * 60 * 1000); // Check every 5 minutes
     } else {
       if (monitoringIntervalRef.current) {
         clearInterval(monitoringIntervalRef.current);
