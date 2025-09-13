@@ -37,13 +37,26 @@ export default function LocationCard({
 
   // Set initial countdown time in seconds
   const getInitialTime = () => {
+    // If there is a real predictive alert, use its time.
     if (predictiveAlert?.prediction?.timeToThreshold && predictiveAlert.prediction.timeToThreshold > 0) {
       return predictiveAlert.prediction.timeToThreshold * 60;
     }
+    // If threshold is already passed, return 0.
+    if (isOverThreshold) {
+      return 0;
+    }
     // Specific mock time for one location as requested
     if (id === 'plaza-main') return 3600; // 1 hour static
-    // Default mock time for others
-    return 7200; // 2 hours
+    
+    // Assign different mock start times for other locations to look more genuine
+    switch (id) {
+        case 'gate-1': return 2700; // 45 minutes
+        case 'market-street': return 0; // Already over
+        case 'subway-station': return 900; // 15 minutes
+        case 'park-entrance': return 5400; // 1 hour 30 minutes
+        case 'concert-hall': return 10800; // 3 hours
+        default: return 7200; // 2 hours
+    }
   };
 
   const [countdown, setCountdown] = useState(getInitialTime());
@@ -60,9 +73,9 @@ export default function LocationCard({
   }, [countdown, id]);
 
    useEffect(() => {
-    // Reset countdown if a new predictive alert comes in
+    // Reset countdown if a new predictive alert comes in or if people count changes
     setCountdown(getInitialTime());
-  }, [predictiveAlert]);
+   }, [predictiveAlert, currentPeople]);
 
 
   const getProgressColor = () => {
@@ -132,9 +145,11 @@ export default function LocationCard({
       </CardContent>
       <CardFooter>
         <div className="w-full text-center text-muted-foreground text-sm p-2 rounded-md bg-muted/50">
-             <div className="flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-400 font-bold">
+             <div className={cn("flex items-center justify-center gap-2 font-bold", isOverThreshold ? 'text-destructive' : 'text-yellow-600 dark:text-yellow-400')}>
                 <Clock className="size-4" />
-                 {countdown > 0 ? (
+                 {isOverThreshold ? (
+                    <span>Threshold Exceeded</span>
+                 ) : countdown > 0 ? (
                     <span>Threshold in {formatDuration(countdown)}</span>
                  ) : (
                     <span>Threshold Potentially Reached</span>
