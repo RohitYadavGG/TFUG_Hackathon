@@ -1,5 +1,22 @@
 # SmartGuard: AI-Powered City Safety Monitor
 
+<h2>🔗 Live Demo</h2>
+<p>Check out the live demo of our <strong>Smart Crowd Safety System</strong> here:</p>
+
+<p><a href="[https://your-demo-link.com](https://studio--studio-3597331857-d1b09.us-central1.hosted.app/)" target="_blank" style="color:#1a73e8; font-weight:bold; text-decoration:none;">Click to View Live Demo</a></p>
+
+<h3>Demo Features</h3>
+<ul>
+    <li><strong>Realtime Crowd Monitoring:</strong> See live crowd counts from camera feeds.</li>
+    <li><strong>Automatic Alerts:</strong> Receive alerts when crowd density exceeds safe thresholds.</li>
+    <li><strong>Interactive Dashboard:</strong> View locations, severity, and recommendations in real-time.</li>
+    <li><strong>Firebase Integration:</strong> All reports and alerts are stored for historical tracking.</li>
+</ul>
+
+<blockquote style="background:#e8f0fe; border-left:5px solid #1a73e8; padding:10px 15px; margin:15px 0; color:#333;">
+⚡ <em>Note:</em> For best experience, open the demo on a desktop or laptop with a stable internet connection.
+</blockquote>
+
 <h2>Problem Statement</h2>
 <p>Large gatherings in public places (temples, stadiums, concerts, metro stations) can become <strong>dangerous due to overcrowding</strong>. When too many people gather in a small area, the risk of <strong>stampedes increases</strong>, leading to injuries and fatalities. Real-time monitoring and preventive action are often missing in such scenarios.</p>
 
