@@ -95,7 +95,7 @@ export default function LocationCard({
         <div className="aspect-video overflow-hidden rounded-md">
           {id === 'central-gateway' ? (
             <video
-              src="/docs/people_crowd_at_metro.mp4"
+              src="/docs/sample.mp4"
               autoPlay
               loop
               muted
