@@ -1,4 +1,5 @@
 
+
 import Image from 'next/image';
 import type { Location } from '@/lib/types';
 import {
@@ -93,26 +94,15 @@ export default function LocationCard({
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
         <div className="aspect-video overflow-hidden rounded-md">
-          {id === 'central-gateway' ? (
-            <video
-              src="/docs/sample.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="object-cover w-full h-full"
-            />
-          ) : (
-            image && (
-                <Image
-                  src={image.imageUrl}
-                  alt={`Camera feed for ${name}`}
-                  width={600}
-                  height={400}
-                  className="object-cover w-full h-full"
-                  data-ai-hint={image.imageHint}
-                />
-            )
+          {image && (
+              <Image
+                src={image.imageUrl}
+                alt={`Camera feed for ${name}`}
+                width={600}
+                height={400}
+                className="object-cover w-full h-full"
+                data-ai-hint={image.imageHint}
+              />
           )}
         </div>
         <div className="space-y-4">
