@@ -179,10 +179,6 @@ export default function DashboardClient({
     });
   };
   
-  const startManualAnalysis = (locationId: string) => {
-    setAnalyzingId(locationId);
-    handleAnalyze(locationId, false);
-  }
 
   // Effect for proactive monitoring
   useEffect(() => {
@@ -247,9 +243,6 @@ export default function DashboardClient({
         </div>
         <LocationGrid
           locations={locations}
-          onAnalyze={startManualAnalysis}
-          isAnalyzing={isPending && !!analyzingId}
-          analyzingId={analyzingId}
         />
 
         <Separator />

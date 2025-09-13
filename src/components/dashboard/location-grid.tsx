@@ -3,16 +3,10 @@ import LocationCard from './location-card';
 
 type LocationGridProps = {
   locations: Location[];
-  onAnalyze: (locationId: string, isProactive?: boolean) => void;
-  isAnalyzing: boolean;
-  analyzingId: string | null;
 };
 
 export default function LocationGrid({
   locations,
-  onAnalyze,
-  isAnalyzing,
-  analyzingId,
 }: LocationGridProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -20,8 +14,6 @@ export default function LocationGrid({
         <LocationCard
           key={location.id}
           location={location}
-          onAnalyze={onAnalyze}
-          isAnalyzing={isAnalyzing && analyzingId === location.id}
         />
       ))}
     </div>
