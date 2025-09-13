@@ -20,12 +20,18 @@ const PredictCrowdDensityInputSchema = z.object({
 });
 export type PredictCrowdDensityInput = z.infer<typeof PredictCrowdDensityInputSchema>;
 
+const PredictionPointSchema = z.object({
+    minute: z.number().describe('The minute offset from the current time.'),
+    count: z.number().describe('The predicted number of people.'),
+});
+
 const PredictCrowdDensityOutputSchema = z.object({
   alert: z.string().describe('The alert message for authorities.'),
   severity: z.enum(['low', 'medium', 'high']).describe('The severity level.'),
   recommendation: z.string().describe('The recommendation for authorities.'),
   prediction: z.object({
     timeToThreshold: z.number().describe('Predicted time in minutes to reach the threshold. Negative if already over.'),
+    series: z.array(PredictionPointSchema).describe('A series of predicted crowd counts over the next 30 minutes.'),
   }),
   audioAnnouncement: z.string().optional().describe('Data URI of the generated audio announcement.'),
 });
@@ -72,6 +78,15 @@ const predictCrowdDensityFlow = ai.defineFlow(
     } else if (severity === 'medium') {
       recommendation = `Prepare for crowd control measures at ${location}. Consider diverting new arrivals.`;
     }
+    
+    // Generate prediction series
+    const predictionSeries: { minute: number; count: number }[] = [];
+    let currentPredictionCount = peopleCount;
+    for (let i = 0; i <= 30; i += 5) {
+      predictionSeries.push({ minute: i, count: Math.round(currentPredictionCount) });
+      currentPredictionCount += netFlow * 5;
+    }
+
 
     let audioAnnouncement: string | undefined;
     if (severity !== 'low') {
@@ -93,6 +108,7 @@ const predictCrowdDensityFlow = ai.defineFlow(
       recommendation,
       prediction: {
         timeToThreshold,
+        series: predictionSeries,
       },
       audioAnnouncement,
     };

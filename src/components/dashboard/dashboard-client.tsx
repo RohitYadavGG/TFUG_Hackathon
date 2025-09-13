@@ -12,6 +12,7 @@ import LocationGrid from './location-grid';
 import AlertsFeed from './alerts-feed';
 import MapOverview from './map-overview';
 import CrowdDensityChart from './crowd-density-chart';
+import PredictionModal from './prediction-modal';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
@@ -28,6 +29,7 @@ export default function DashboardClient({
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const { toast } = useToast();
   const [isProactiveMonitoring, setIsProactiveMonitoring] = useState(false);
+  const [predictionData, setPredictionData] = useState<{ location: Location, alert: Alert } | null>(null);
 
   const monitoringIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -71,11 +73,17 @@ export default function DashboardClient({
 
         if (newAlert) { // Only toast if it's a real alert
           if (!isProactive) {
-            toast({
-              title: `Alert: ${newAlert.severity.toUpperCase()}`,
-              description: `New alert generated for ${newAlert.locationName}.`,
-              variant: newAlert.severity === 'high' ? 'destructive' : 'default',
-            });
+             const location = locations.find(l => l.id === locationId);
+            if (location && newAlert.prediction?.series) {
+              setPredictionData({ location, alert: newAlert });
+            }
+            if(newAlert.severity !== 'low') {
+                toast({
+                title: `Alert: ${newAlert.severity.toUpperCase()}`,
+                description: `New alert generated for ${newAlert.locationName}.`,
+                variant: newAlert.severity === 'high' ? 'destructive' : 'default',
+                });
+            }
           }
         }
         
@@ -130,45 +138,52 @@ export default function DashboardClient({
 
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold font-headline">Monitored Locations</h2>
-        <div className="flex items-center space-x-2">
-          <Switch
-            id="proactive-monitoring"
-            checked={isProactiveMonitoring}
-            onCheckedChange={setIsProactiveMonitoring}
-          />
-          <Label htmlFor="proactive-monitoring">Proactive Monitoring</Label>
+    <>
+      <div className="space-y-8">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold font-headline">Monitored Locations</h2>
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="proactive-monitoring"
+              checked={isProactiveMonitoring}
+              onCheckedChange={setIsProactiveMonitoring}
+            />
+            <Label htmlFor="proactive-monitoring">Proactive Monitoring</Label>
+          </div>
         </div>
-      </div>
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <LocationGrid
-            locations={locations}
-            onAnalyze={handleAnalyze}
-            isAnalyzing={isPending && !!analyzingId}
-            analyzingId={analyzingId}
-          />
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
+            <LocationGrid
+              locations={locations}
+              onAnalyze={handleAnalyze}
+              isAnalyzing={isPending && !!analyzingId}
+              analyzingId={analyzingId}
+            />
+          </div>
+          <div className="space-y-6 lg:col-span-1">
+            <h2 className="text-2xl font-bold font-headline">Alerts Feed</h2>
+            <AlertsFeed alerts={alerts} />
+          </div>
         </div>
-        <div className="space-y-6 lg:col-span-1">
-          <h2 className="text-2xl font-bold font-headline">Alerts Feed</h2>
-          <AlertsFeed alerts={alerts} />
-        </div>
-      </div>
 
-      <Separator />
+        <Separator />
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
-        <div className="space-y-6 lg:col-span-3">
-          <h2 className="text-2xl font-bold font-headline">City Overview</h2>
-          <MapOverview />
-        </div>
-        <div className="space-y-6 lg:col-span-2">
-          <h2 className="text-2xl font-bold font-headline">Crowd Analytics</h2>
-          <CrowdDensityChart locations={locations} />
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
+          <div className="space-y-6 lg:col-span-3">
+            <h2 className="text-2xl font-bold font-headline">City Overview</h2>
+            <MapOverview />
+          </div>
+          <div className="space-y-6 lg:col-span-2">
+            <h2 className="text-2xl font-bold font-headline">Crowd Analytics</h2>
+            <CrowdDensityChart locations={locations} />
+          </div>
         </div>
       </div>
-    </div>
+      <PredictionModal 
+        isOpen={!!predictionData}
+        onClose={() => setPredictionData(null)}
+        data={predictionData}
+      />
+    </>
   );
 }

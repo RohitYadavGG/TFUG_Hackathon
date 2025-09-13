@@ -68,15 +68,27 @@ export async function analyzeDensityAction(
   };
 
   // Save to Firestore
-  const docRef = await addDoc(collection(db, 'crowd_alerts'), {
-    ...newAlert,
-    timestamp: serverTimestamp(),
-  });
+  if (newAlert.severity !== 'low' || !isProactive) {
+    const docRef = await addDoc(collection(db, 'crowd_alerts'), {
+        ...newAlert,
+        timestamp: serverTimestamp(),
+    });
+    
+    return {
+        alert: {
+        ...newAlert,
+        id: docRef.id,
+        timestamp: new Date().toISOString(),
+        },
+        newPeopleCount: currentPeople,
+    };
+  }
+
 
   return {
     alert: {
       ...newAlert,
-      id: docRef.id,
+      id: `proactive-check-${Date.now()}`,
       timestamp: new Date().toISOString(),
     },
     newPeopleCount: currentPeople,

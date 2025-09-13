@@ -21,6 +21,7 @@ export type Alert = {
   // Optional fields for predictive alerts
   prediction?: {
     timeToThreshold: number; // in minutes
+    series?: { minute: number; count: number }[];
   };
   audioAnnouncement?: string; // Data URI for the audio
 };
