@@ -14,7 +14,6 @@ import {
 } from 'firebase/firestore';
 
 import LocationGrid from './location-grid';
-import AlertsFeed from './alerts-feed';
 import MapOverview from './map-overview';
 import CrowdDensityChart from './crowd-density-chart';
 import PredictionModal from './prediction-modal';
@@ -214,20 +213,12 @@ export default function DashboardClient({
             <Label htmlFor="proactive-monitoring">Proactive Monitoring</Label>
           </div>
         </div>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="space-y-6 lg:col-span-2">
-            <LocationGrid
-              locations={locations}
-              onAnalyze={startManualAnalysis}
-              isAnalyzing={isPending && !!analyzingId}
-              analyzingId={analyzingId}
-            />
-          </div>
-          <div className="space-y-6 lg:col-span-1">
-            <h2 className="text-2xl font-bold font-headline">Alerts Feed</h2>
-            <AlertsFeed alerts={alerts} />
-          </div>
-        </div>
+        <LocationGrid
+          locations={locations}
+          onAnalyze={startManualAnalysis}
+          isAnalyzing={isPending && !!analyzingId}
+          analyzingId={analyzingId}
+        />
 
         <Separator />
 
