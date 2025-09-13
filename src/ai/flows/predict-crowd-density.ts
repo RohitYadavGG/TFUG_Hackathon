@@ -10,6 +10,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { generateAnnouncement } from './generate-announcement';
+import { sendEmailAlert } from './send-email-alert';
 
 const PredictCrowdDensityInputSchema = z.object({
   location: z.string().describe('The location of the camera feed.'),
@@ -102,6 +103,20 @@ const predictCrowdDensityFlow = ai.defineFlow(
         audioAnnouncement = audioResponse.media;
     }
     
+    // Send email for high severity alerts
+    if (severity === 'high') {
+      await sendEmailAlert({
+        subject: `High Severity Alert: Overcrowding at ${location}`,
+        body: `
+          <h1>High Severity Alert</h1>
+          <p><strong>Location:</strong> ${location}</p>
+          <p><strong>Alert:</strong> ${alertMessage}</p>
+          <p><strong>Recommendation:</strong> ${recommendation}</p>
+          <p>This is an automated notification from the SmartGuard City Safety Monitor.</p>
+        `,
+      });
+    }
+
     return {
       alert: alertMessage,
       severity,

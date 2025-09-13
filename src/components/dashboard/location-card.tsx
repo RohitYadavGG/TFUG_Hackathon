@@ -21,6 +21,8 @@ import {
 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
+import { formatDuration } from '@/lib/utils';
+
 
 type LocationCardProps = {
   location: Location;
@@ -50,7 +52,7 @@ export default function LocationCard({
         {predictiveAlert && predictiveAlert.prediction && predictiveAlert.prediction.timeToThreshold > 0 && (
              <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-yellow-500/90 text-yellow-900 p-1.5 rounded-md text-xs font-bold animate-pulse">
                 <Clock className="size-4" />
-                <span>~{Math.ceil(predictiveAlert.prediction.timeToThreshold)} min</span>
+                <span>{formatDuration(predictiveAlert.prediction.timeToThreshold * 60)}</span>
              </div>
         )}
       <CardHeader>
