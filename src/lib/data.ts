@@ -9,6 +9,8 @@ const locationsData: Location[] = [
     rateOfIncrease: 'slow',
     characteristics: 'Main entrance, narrow passage.',
     cameraFeedImageId: '1',
+    peopleIn: 10,
+    peopleOut: 5,
   },
   {
     id: 'plaza-main',
@@ -18,6 +20,8 @@ const locationsData: Location[] = [
     rateOfIncrease: 'moderate',
     characteristics: 'Large open area, central gathering point.',
     cameraFeedImageId: '2',
+    peopleIn: 50,
+    peopleOut: 30,
   },
   {
     id: 'market-street',
@@ -27,6 +31,8 @@ const locationsData: Location[] = [
     rateOfIncrease: 'rapid',
     characteristics: 'Crowded marketplace with many stalls.',
     cameraFeedImageId: '3',
+    peopleIn: 40,
+    peopleOut: 15,
   },
   {
     id: 'subway-station',
@@ -36,6 +42,8 @@ const locationsData: Location[] = [
     rateOfIncrease: 'moderate',
     characteristics: 'Underground station, multiple platforms.',
     cameraFeedImageId: '4',
+    peopleIn: 60,
+    peopleOut: 45,
   },
   {
     id: 'park-entrance',
@@ -45,6 +53,8 @@ const locationsData: Location[] = [
     rateOfIncrease: 'slow',
     characteristics: 'Wide entrance to a large public park.',
     cameraFeedImageId: '5',
+    peopleIn: 20,
+    peopleOut: 25,
   },
   {
     id: 'concert-hall',
@@ -54,6 +64,8 @@ const locationsData: Location[] = [
     rateOfIncrease: 'slow',
     characteristics: 'Indoor concert venue.',
     cameraFeedImageId: '6',
+    peopleIn: 100,
+    peopleOut: 110,
   },
 ];
 
@@ -69,4 +81,15 @@ export async function getLocations(): Promise<Location[]> {
 export async function getLocationById(id: string): Promise<Location | undefined> {
     const locations = await getLocations();
     return locations.find((l) => l.id === id);
+}
+
+export function simulatePeopleFlow(locations: Location[]): Location[] {
+  return locations.map(loc => {
+    const peopleChange = Math.floor(Math.random() * (loc.peopleIn / 4)) - Math.floor(Math.random() * (loc.peopleOut / 4));
+    const newPeopleCount = Math.max(0, loc.currentPeople + peopleChange);
+    return {
+      ...loc,
+      currentPeople: newPeopleCount,
+    };
+  });
 }

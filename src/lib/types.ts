@@ -6,6 +6,9 @@ export type Location = {
   rateOfIncrease: 'slow' | 'moderate' | 'rapid';
   characteristics: string;
   cameraFeedImageId: string;
+  // Representing people flow per minute
+  peopleIn: number; 
+  peopleOut: number;
 };
 
 export type Alert = {
@@ -15,4 +18,9 @@ export type Alert = {
   severity: 'low' | 'medium' | 'high';
   recommendation: string;
   timestamp: string;
+  // Optional fields for predictive alerts
+  prediction?: {
+    timeToThreshold: number; // in minutes
+  };
+  audioAnnouncement?: string; // Data URI for the audio
 };

@@ -3,7 +3,7 @@ import LocationCard from './location-card';
 
 type LocationGridProps = {
   locations: Location[];
-  onAnalyze: (locationId: string) => void;
+  onAnalyze: (locationId: string, isProactive?: boolean) => void;
   isAnalyzing: boolean;
   analyzingId: string | null;
 };

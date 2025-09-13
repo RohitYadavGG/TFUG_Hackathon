@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Users, AlertTriangle, Cpu, Loader2 } from 'lucide-react';
+import { Users, AlertTriangle, Cpu, Loader2, ArrowUp, ArrowDown } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 
@@ -25,7 +25,7 @@ export default function LocationCard({
   onAnalyze,
   isAnalyzing,
 }: LocationCardProps) {
-  const { id, name, currentPeople, threshold, cameraFeedImageId } = location;
+  const { id, name, currentPeople, threshold, cameraFeedImageId, peopleIn, peopleOut } = location;
   const percentage = Math.round((currentPeople / threshold) * 100);
   const isOverThreshold = currentPeople > threshold;
 
@@ -56,32 +56,44 @@ export default function LocationCard({
             />
           </div>
         )}
-        <div>
-          <div className="flex justify-between items-center mb-1 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Users className="size-4" />
-              <span>Crowd Level</span>
+        <div className='space-y-4'>
+          <div>
+            <div className="flex justify-between items-center mb-1 text-sm">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Users className="size-4" />
+                <span>Crowd Level</span>
+              </div>
+              <span
+                className={cn(
+                  'font-bold',
+                  isOverThreshold ? 'text-destructive' : 'text-foreground'
+                )}
+              >
+                {currentPeople} / {threshold}
+              </span>
             </div>
-            <span
-              className={cn(
-                'font-bold',
-                isOverThreshold ? 'text-destructive' : 'text-foreground'
-              )}
-            >
-              {currentPeople} / {threshold}
-            </span>
+            <Progress
+              value={percentage}
+              className="h-2"
+              indicatorClassName={getProgressColor()}
+            />
+            {isOverThreshold && (
+              <div className="flex items-center gap-2 text-destructive text-xs mt-2">
+                <AlertTriangle className="size-3.5" />
+                <span>Threshold exceeded by {currentPeople - threshold}</span>
+              </div>
+            )}
           </div>
-          <Progress
-            value={percentage}
-            className="h-2"
-            indicatorClassName={getProgressColor()}
-          />
-          {isOverThreshold && (
-            <div className="flex items-center gap-2 text-destructive text-xs mt-2">
-              <AlertTriangle className="size-3.5" />
-              <span>Threshold exceeded by {currentPeople - threshold}</span>
-            </div>
-          )}
+          <div className='flex justify-between text-sm text-muted-foreground'>
+              <div className='flex items-center gap-2'>
+                  <ArrowUp className='size-4 text-green-500'/>
+                  <span>In: {peopleIn}/min</span>
+              </div>
+              <div className='flex items-center gap-2'>
+                  <ArrowDown className='size-4 text-red-500'/>
+                  <span>Out: {peopleOut}/min</span>
+              </div>
+          </div>
         </div>
       </CardContent>
       <CardFooter>
