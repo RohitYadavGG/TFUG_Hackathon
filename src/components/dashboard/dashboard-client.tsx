@@ -31,13 +31,44 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 
+const initialMockAlerts: Alert[] = [
+    {
+      id: 'mock-1',
+      locationName: 'Market Street',
+      message: 'CRITICAL: Overcrowding at Market Street. 210 people detected, exceeding threshold of 200.',
+      severity: 'high',
+      recommendation: 'Immediate action required. Divert traffic from Market Street and dispatch personnel.',
+      timestamp: new Date().toISOString(),
+    },
+    {
+      id: 'mock-2',
+      locationName: 'Central Subway',
+      message: 'WARNING: High crowd density at Central Subway. 280 people detected (Threshold: 300).',
+      severity: 'medium',
+      recommendation: 'Prepare for crowd control measures at Central Subway. Consider diverting new arrivals.',
+      timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'mock-3',
+      locationName: 'Temple Gate 1',
+      message: 'Crowd at Temple Gate 1 is currently at 75 people (Threshold: 80).',
+      severity: 'low',
+      recommendation: 'Continue monitoring Temple Gate 1.',
+      timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+      prediction: {
+        timeToThreshold: 15,
+        series: [],
+      },
+    },
+];
+
 export default function DashboardClient({
   initialLocations,
 }: {
   initialLocations: Location[];
 }) {
   const [locations, setLocations] = useState<Location[]>(initialLocations);
-  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [alerts, setAlerts] = useState<Alert[]>(initialMockAlerts);
   const [isPending, startTransition] = useTransition();
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const { toast } = useToast();
@@ -74,7 +105,8 @@ export default function DashboardClient({
           audioAnnouncement: data.audioAnnouncement,
         });
       });
-      setAlerts(alertsData);
+      // Prepend new alerts to any existing mock alerts
+      setAlerts(prevAlerts => [...alertsData, ...prevAlerts.filter(p => p.id.startsWith('mock-'))]);
     });
 
     return () => unsubscribe();
