@@ -47,13 +47,13 @@ export default function LocationCard({
 
   return (
     <Card className="flex flex-col relative overflow-hidden">
-        {predictiveAlert && (
-             <div className="absolute top-0 left-0 right-0 z-10 flex items-center gap-2 bg-yellow-500/90 text-yellow-900 p-2 text-xs font-bold animate-pulse">
+        {predictiveAlert && predictiveAlert.prediction && predictiveAlert.prediction.timeToThreshold > 0 && (
+             <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-yellow-500/90 text-yellow-900 p-1.5 rounded-md text-xs font-bold animate-pulse">
                 <Clock className="size-4" />
-                <span>Predicted Overcrowd in ~{Math.ceil(predictiveAlert.prediction?.timeToThreshold || 0)} min</span>
+                <span>~{Math.ceil(predictiveAlert.prediction.timeToThreshold)} min</span>
              </div>
         )}
-      <CardHeader className={cn(predictiveAlert ? "pt-10" : "")}>
+      <CardHeader>
         <CardTitle className="font-headline">{name}</CardTitle>
         <CardDescription>Live crowd monitoring</CardDescription>
       </CardHeader>
