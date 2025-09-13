@@ -35,15 +35,15 @@ export async function analyzeDensityAction(
   // In a real app, you would fetch the live people count.
   // Here we'll simulate a slight increase for demonstration.
   const currentPeople = isProactive
-    ? location.currentPeople // Use the updated count for proactive checks
+    ? location.currentPeople
     : Math.min(
         Math.floor(location.threshold * 1.5),
         location.currentPeople + Math.floor(Math.random() * 50) + 10
       );
   
-  if (isProactive && currentPeople < location.threshold * 0.8) {
-     // For proactive checks, only trigger if it's getting close to the threshold
-     // to avoid too many unnecessary alerts.
+  // For proactive checks, only trigger if it's getting close to the threshold
+  // to avoid too many unnecessary alerts, unless it's already over.
+  if (isProactive && currentPeople < location.threshold * 0.7 && currentPeople < location.threshold) {
      return { 
        alert: null, 
        newPeopleCount: currentPeople 
@@ -67,8 +67,10 @@ export async function analyzeDensityAction(
     audioAnnouncement: result.audioAnnouncement,
   };
 
-  // Save to Firestore
-  if (newAlert.severity !== 'low' || !isProactive) {
+  const isPredictiveAlert = result.prediction.timeToThreshold > 0 && result.prediction.timeToThreshold <= 50;
+
+  // Save to Firestore for actual alerts (high/medium severity) or significant predictive alerts
+  if (newAlert.severity !== 'low' || isPredictiveAlert) {
     const docRef = await addDoc(collection(db, 'crowd_alerts'), {
         ...newAlert,
         timestamp: serverTimestamp(),
@@ -85,6 +87,7 @@ export async function analyzeDensityAction(
   }
 
 
+  // For non-critical proactive checks, just return the data without saving
   return {
     alert: {
       ...newAlert,

@@ -5,8 +5,13 @@ import type { Location, Alert } from '@/lib/types';
 import { analyzeDensityAction } from '@/app/actions';
 import { simulatePeopleFlow } from '@/lib/data';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
-
+import {
+  collection,
+  query,
+  orderBy,
+  onSnapshot,
+  Timestamp,
+} from 'firebase/firestore';
 
 import LocationGrid from './location-grid';
 import AlertsFeed from './alerts-feed';
@@ -17,6 +22,15 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 
 export default function DashboardClient({
   initialLocations,
@@ -29,12 +43,21 @@ export default function DashboardClient({
   const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const { toast } = useToast();
   const [isProactiveMonitoring, setIsProactiveMonitoring] = useState(false);
-  const [predictionData, setPredictionData] = useState<{ location: Location, alert: Alert } | null>(null);
+  const [predictionData, setPredictionData] = useState<{
+    location: Location;
+    alert: Alert;
+  } | null>(null);
+  const [predictiveAlert, setPredictiveAlert] = useState<Alert | null>(null);
 
   const monitoringIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Firestore listener for real-time alerts
   useEffect(() => {
-    const q = query(collection(db, 'crowd_alerts'), orderBy('timestamp', 'desc'));
+    const q = query(
+      collection(db, 'crowd_alerts'),
+      orderBy('timestamp', 'desc')
+    );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const alertsData: Alert[] = [];
       querySnapshot.forEach((doc) => {
@@ -45,7 +68,9 @@ export default function DashboardClient({
           message: data.message,
           severity: data.severity,
           recommendation: data.recommendation,
-          timestamp: (data.timestamp as Timestamp)?.toDate().toISOString() || new Date().toISOString(),
+          timestamp:
+            (data.timestamp as Timestamp)?.toDate().toISOString() ||
+            new Date().toISOString(),
           prediction: data.prediction,
           audioAnnouncement: data.audioAnnouncement,
         });
@@ -71,28 +96,36 @@ export default function DashboardClient({
         const { alert: newAlert, newPeopleCount } =
           await analyzeDensityAction(formData);
 
-        if (newAlert) { // Only toast if it's a real alert
+        const location = locations.find((l) => l.id === locationId);
+
+        if (newAlert && location) {
+          const timeToThreshold = newAlert.prediction?.timeToThreshold ?? -1;
+          const isPredictive = timeToThreshold > 0;
+
+          // Update location state
+          setLocations((prev) =>
+            prev.map((l) =>
+              l.id === locationId ? { ...l, currentPeople: newPeopleCount, predictiveAlert: isPredictive ? newAlert : null } : l
+            )
+          );
+
+          if (isPredictive && timeToThreshold <= 50) {
+             setPredictiveAlert(newAlert);
+          }
+
           if (!isProactive) {
-             const location = locations.find(l => l.id === locationId);
-            if (location && newAlert.prediction?.series) {
+            if (newAlert.prediction?.series) {
               setPredictionData({ location, alert: newAlert });
             }
-            if(newAlert.severity !== 'low') {
-                toast({
+            if (newAlert.severity !== 'low') {
+              toast({
                 title: `Alert: ${newAlert.severity.toUpperCase()}`,
                 description: `New alert generated for ${newAlert.locationName}.`,
                 variant: newAlert.severity === 'high' ? 'destructive' : 'default',
-                });
+              });
             }
           }
         }
-        
-        setLocations((prevLocations) =>
-          prevLocations.map((l) =>
-            l.id === locationId ? { ...l, currentPeople: newPeopleCount } : l
-          )
-        );
-
       } catch (error) {
         toast({
           variant: 'destructive',
@@ -110,23 +143,22 @@ export default function DashboardClient({
     });
   };
 
+  // Effect for proactive monitoring
   useEffect(() => {
     if (isProactiveMonitoring) {
       monitoringIntervalRef.current = setInterval(() => {
-        // Simulate real-time data updates
         const updatedLocations = simulatePeopleFlow(locations);
         setLocations(updatedLocations);
-        
-        // Trigger analysis for all locations
-        updatedLocations.forEach(location => {
+        updatedLocations.forEach((location) => {
           handleAnalyze(location.id, true);
         });
-
       }, 5000); // Check every 5 seconds
     } else {
       if (monitoringIntervalRef.current) {
         clearInterval(monitoringIntervalRef.current);
       }
+      // Reset predictive alerts on locations when monitoring is turned off
+      setLocations(prev => prev.map(l => ({...l, predictiveAlert: null})));
     }
 
     return () => {
@@ -135,13 +167,32 @@ export default function DashboardClient({
       }
     };
   }, [isProactiveMonitoring, locations]);
+  
+  // Effect for handling predictive alert audio
+  useEffect(() => {
+    if (predictiveAlert && predictiveAlert?.prediction?.timeToThreshold <= 30 && predictiveAlert.audioAnnouncement) {
+      if (audioRef.current) {
+        audioRef.current.src = predictiveAlert.audioAnnouncement;
+        audioRef.current.loop = true;
+        audioRef.current.play().catch(e => console.error("Audio play failed", e));
+      }
+    } else {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.loop = false;
+      }
+    }
+  }, [predictiveAlert]);
 
 
   return (
     <>
+      <audio ref={audioRef} />
       <div className="space-y-8">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold font-headline">Monitored Locations</h2>
+          <h2 className="text-2xl font-bold font-headline">
+            Monitored Locations
+          </h2>
           <div className="flex items-center space-x-2">
             <Switch
               id="proactive-monitoring"
@@ -179,11 +230,39 @@ export default function DashboardClient({
           </div>
         </div>
       </div>
-      <PredictionModal 
+      <PredictionModal
         isOpen={!!predictionData}
         onClose={() => setPredictionData(null)}
         data={predictionData}
       />
+      <AlertDialog
+        open={!!predictiveAlert}
+        onOpenChange={() => {
+            setPredictiveAlert(null);
+             if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.loop = false;
+            }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              ⚠️ Predictive Alert: {predictiveAlert?.locationName}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+                {`Overcrowding predicted in approximately ${Math.ceil(predictiveAlert?.prediction?.timeToThreshold || 0)} minutes.`}
+                <br/>
+                {predictiveAlert?.recommendation}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setPredictiveAlert(null)}>
+              Acknowledge
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

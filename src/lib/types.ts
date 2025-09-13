@@ -9,6 +9,7 @@ export type Location = {
   // Representing people flow per minute
   peopleIn: number; 
   peopleOut: number;
+  predictiveAlert?: Alert | null;
 };
 
 export type Alert = {

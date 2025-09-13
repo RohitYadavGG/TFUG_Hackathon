@@ -10,7 +10,15 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Users, AlertTriangle, Cpu, Loader2, ArrowUp, ArrowDown } from 'lucide-react';
+import {
+  Users,
+  AlertTriangle,
+  Cpu,
+  Loader2,
+  ArrowUp,
+  ArrowDown,
+  Clock,
+} from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 
@@ -25,7 +33,7 @@ export default function LocationCard({
   onAnalyze,
   isAnalyzing,
 }: LocationCardProps) {
-  const { id, name, currentPeople, threshold, cameraFeedImageId, peopleIn, peopleOut } = location;
+  const { id, name, currentPeople, threshold, cameraFeedImageId, peopleIn, peopleOut, predictiveAlert } = location;
   const percentage = Math.round((currentPeople / threshold) * 100);
   const isOverThreshold = currentPeople > threshold;
 
@@ -38,8 +46,14 @@ export default function LocationCard({
   };
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader>
+    <Card className="flex flex-col relative overflow-hidden">
+        {predictiveAlert && (
+             <div className="absolute top-0 left-0 right-0 z-10 flex items-center gap-2 bg-yellow-500/90 text-yellow-900 p-2 text-xs font-bold animate-pulse">
+                <Clock className="size-4" />
+                <span>Predicted Overcrowd in ~{Math.ceil(predictiveAlert.prediction?.timeToThreshold || 0)} min</span>
+             </div>
+        )}
+      <CardHeader className={cn(predictiveAlert ? "pt-10" : "")}>
         <CardTitle className="font-headline">{name}</CardTitle>
         <CardDescription>Live crowd monitoring</CardDescription>
       </CardHeader>
@@ -56,7 +70,7 @@ export default function LocationCard({
             />
           </div>
         )}
-        <div className='space-y-4'>
+        <div className="space-y-4">
           <div>
             <div className="flex justify-between items-center mb-1 text-sm">
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -84,26 +98,22 @@ export default function LocationCard({
               </div>
             )}
           </div>
-          <div className='flex justify-between text-sm text-muted-foreground'>
-              <div className='flex items-center gap-2'>
-                  <ArrowUp className='size-4 text-green-500'/>
-                  <span>In: {peopleIn}/min</span>
-              </div>
-              <div className='flex items-center gap-2'>
-                  <ArrowDown className='size-4 text-red-500'/>
-                  <span>Out: {peopleOut}/min</span>
-              </div>
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <ArrowUp className="size-4 text-green-500" />
+              <span>In: {peopleIn}/min</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ArrowDown className="size-4 text-red-500" />
+              <span>Out: {peopleOut}/min</span>
+            </div>
           </div>
         </div>
       </CardContent>
       <CardFooter>
         <form action={() => onAnalyze(id)} className="w-full">
           <Button className="w-full" type="submit" disabled={isAnalyzing}>
-            {isAnalyzing ? (
-              <Loader2 className="animate-spin" />
-            ) : (
-              <Cpu />
-            )}
+            {isAnalyzing ? <Loader2 className="animate-spin" /> : <Cpu />}
             <span>{isAnalyzing ? 'Analyzing...' : 'Analyze Density'}</span>
           </Button>
         </form>
