@@ -46,9 +46,40 @@ const severityConfig = {
   },
 };
 
+const initialMockAlerts: Alert[] = [
+    {
+      id: 'mock-1',
+      locationName: 'Market Street',
+      message: 'Overcrowding detected at Market Street, exceeded by 10 people.',
+      severity: 'high',
+      recommendation: 'Divert visitors to Gate 2 and send security team immediately.',
+      timestamp: new Date().toISOString(),
+    },
+    {
+      id: 'mock-2',
+      locationName: 'Central Subway',
+      message: 'WARNING: High crowd density at Central Subway. 280 people detected (Threshold: 300).',
+      severity: 'medium',
+      recommendation: 'Prepare for crowd control measures at Central Subway. Consider diverting new arrivals.',
+      timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    },
+    {
+      id: 'mock-3',
+      locationName: 'Temple Gate 1',
+      message: 'Crowd at Temple Gate 1 is currently at 75 people (Threshold: 80).',
+      severity: 'low',
+      recommendation: 'Continue monitoring Temple Gate 1.',
+      timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+      prediction: {
+        timeToThreshold: 15,
+        series: [],
+      },
+    },
+];
+
 export default function NotificationBell() {
-  const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [alerts, setAlerts] = useState<Alert[]>(initialMockAlerts);
+  const [unreadCount, setUnreadCount] = useState(initialMockAlerts.filter(a => a.severity !== 'low').length);
 
   useEffect(() => {
     // Query for medium and high severity alerts, ordered by timestamp
@@ -75,8 +106,20 @@ export default function NotificationBell() {
           prediction: data.prediction,
         });
       });
-      setAlerts(alertsData);
-      setUnreadCount(alertsData.length);
+      
+      const newAlerts = [...initialMockAlerts, ...alertsData].reduce((acc, current) => {
+          if (!acc.find(item => item.id === current.id)) {
+              acc.push(current);
+          }
+          return acc;
+      }, [] as Alert[]).sort((a,b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+
+      setAlerts(newAlerts);
+      
+      const newUnreadCount = newAlerts.filter(a => new Date(a.timestamp).getTime() > Date.now() - 5 * 60 * 1000 && a.severity !== 'low').length;
+      setUnreadCount(newUnreadCount);
+
     });
 
     return () => unsubscribe();

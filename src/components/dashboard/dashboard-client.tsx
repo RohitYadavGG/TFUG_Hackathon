@@ -31,37 +31,6 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 
-const initialMockAlerts: Alert[] = [
-    {
-      id: 'mock-1',
-      locationName: 'Market Street',
-      message: 'CRITICAL: Overcrowding at Market Street. 210 people detected, exceeding threshold of 200.',
-      severity: 'high',
-      recommendation: 'Immediate action required. Divert traffic from Market Street and dispatch personnel.',
-      timestamp: new Date().toISOString(),
-    },
-    {
-      id: 'mock-2',
-      locationName: 'Central Subway',
-      message: 'WARNING: High crowd density at Central Subway. 280 people detected (Threshold: 300).',
-      severity: 'medium',
-      recommendation: 'Prepare for crowd control measures at Central Subway. Consider diverting new arrivals.',
-      timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    },
-    {
-      id: 'mock-3',
-      locationName: 'Temple Gate 1',
-      message: 'Crowd at Temple Gate 1 is currently at 75 people (Threshold: 80).',
-      severity: 'low',
-      recommendation: 'Continue monitoring Temple Gate 1.',
-      timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-      prediction: {
-        timeToThreshold: 15,
-        series: [],
-      },
-    },
-];
-
 export default function DashboardClient({
   initialLocations,
 }: {
