@@ -7,10 +7,13 @@
 
 <h3>Demo Features</h3>
 <ul>
-    <li><strong>Realtime Crowd Monitoring:</strong> See live crowd counts from camera feeds.</li>
-    <li><strong>Automatic Alerts:</strong> Receive alerts when crowd density exceeds safe thresholds.</li>
-    <li><strong>Interactive Dashboard:</strong> View locations, severity, and recommendations in real-time.</li>
-    <li><strong>Firebase Integration:</strong> All reports and alerts are stored for historical tracking.</li>
+
+**Please note:** This application is a high-fidelity prototype designed to showcase the vision and functionality of the SmartGuard system. The "live" data and events are simulated to demonstrate the user experience.
+
+-   **Simulated Data Flow**: The crowd counts and people flow rates (`peopleIn`, `peopleOut`) are based on mock data that simulates real-world fluctuations. The "Proactive Monitoring" feature runs a simulation loop to create a dynamic environment.
+-   **Predictive Countdown Timers**: The timers on each location card are for demonstration purposes. They are initialized with varied mock data to appear realistic and count down in real-time to illustrate the predictive analytics feature.
+-   **Automated Alerts**: The system is configured to periodically generate alerts, including high-severity notifications for breached thresholds (like Market Street), to simulate a real-time monitoring and response scenario.
+-   **Static Video Feeds**: The video camera feed is a static, looping video to visually represent live monitoring without requiring an actual camera connection.
 </ul>
 
 <blockquote style="background:#e8f0fe; border-left:5px solid #1a73e8; padding:10px 15px; margin:15px 0; color:#333;">
