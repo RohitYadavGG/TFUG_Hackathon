@@ -1,3 +1,4 @@
+
 import type { Location } from '@/lib/types';
 
 const locationsData: Location[] = [
@@ -36,14 +37,14 @@ const locationsData: Location[] = [
   },
   {
     id: 'central-gateway',
-    name: 'Central Gateway',
-    threshold: 180,
-    currentPeople: 150,
+    name: 'Central Subway',
+    threshold: 300,
+    currentPeople: 280,
     rateOfIncrease: 'moderate',
-    characteristics: 'A new gateway',
-    cameraFeedImageId: '7',
-    peopleIn: 30,
-    peopleOut: 20,
+    characteristics: 'Major transit hub with multiple lines.',
+    cameraFeedImageId: '4',
+    peopleIn: 60,
+    peopleOut: 65,
   },
   {
     id: 'park-entrance',
