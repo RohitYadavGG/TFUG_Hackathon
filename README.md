@@ -1,7 +1,5 @@
 # SmartGuard: AI-Powered City Safety Monitor
 
-![SmartGuard Dashboard](https://github.com/user-attachments/assets/15a8a69e-4e4c-473d-8e4a-9e19a4b3d7b4)
-
 <h2>Problem Statement</h2>
 <p>Large gatherings in public places (temples, stadiums, concerts, metro stations) can become <strong>dangerous due to overcrowding</strong>. When too many people gather in a small area, the risk of <strong>stampedes increases</strong>, leading to injuries and fatalities. Real-time monitoring and preventive action are often missing in such scenarios.</p>
 
