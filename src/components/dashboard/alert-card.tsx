@@ -11,7 +11,7 @@ import {
   Lightbulb,
   MapPin,
   Clock,
-  ClockForward,
+  Forward,
   Volume2,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
@@ -71,7 +71,7 @@ export default function AlertCard({ alert }: { alert: AlertType }) {
         
         {alert.prediction && alert.prediction.timeToThreshold > 0 && (
           <div className="flex items-start gap-2 text-yellow-500 bg-yellow-500/10 p-2 rounded-md">
-            <ClockForward className="size-4 mt-0.5 shrink-0" />
+            <Forward className="size-4 mt-0.5 shrink-0" />
             <p className="text-xs">
               <span className="font-bold">Prediction: </span>
               Threshold may be reached in approximately {Math.ceil(alert.prediction.timeToThreshold)} minutes.
