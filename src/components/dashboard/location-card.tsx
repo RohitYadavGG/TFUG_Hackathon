@@ -19,6 +19,7 @@ import {
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { formatDuration } from '@/lib/utils';
+import RealTimeClock from './real-time-clock';
 
 
 type LocationCardProps = {
@@ -113,7 +114,7 @@ export default function LocationCard({
                     <span>Threshold predicted in {formatDuration(predictiveAlert.prediction.timeToThreshold * 60)}</span>
                 </div>
             ) : (
-                <span>Live Monitoring Active</span>
+                <RealTimeClock />
             )}
         </div>
       </CardFooter>
