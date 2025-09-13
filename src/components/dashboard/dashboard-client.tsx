@@ -4,6 +4,9 @@ import { useState, useTransition, useEffect, useRef } from 'react';
 import type { Location, Alert } from '@/lib/types';
 import { analyzeDensityAction } from '@/app/actions';
 import { simulatePeopleFlow } from '@/lib/data';
+import { db } from '@/lib/firebase';
+import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
+
 
 import LocationGrid from './location-grid';
 import AlertsFeed from './alerts-feed';
@@ -28,6 +31,29 @@ export default function DashboardClient({
 
   const monitoringIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    const q = query(collection(db, 'crowd_alerts'), orderBy('timestamp', 'desc'));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const alertsData: Alert[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        alertsData.push({
+          id: doc.id,
+          locationName: data.locationName,
+          message: data.message,
+          severity: data.severity,
+          recommendation: data.recommendation,
+          timestamp: (data.timestamp as Timestamp)?.toDate().toISOString() || new Date().toISOString(),
+          prediction: data.prediction,
+          audioAnnouncement: data.audioAnnouncement,
+        });
+      });
+      setAlerts(alertsData);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const handleAnalyze = (locationId: string, isProactive = false) => {
     if (!isProactive) {
       setAnalyzingId(locationId);
@@ -43,9 +69,7 @@ export default function DashboardClient({
         const { alert: newAlert, newPeopleCount } =
           await analyzeDensityAction(formData);
 
-        if (newAlert.id) { // Only add if it's a real alert
-          setAlerts((prevAlerts) => [newAlert, ...prevAlerts]);
-
+        if (newAlert) { // Only toast if it's a real alert
           if (!isProactive) {
             toast({
               title: `Alert: ${newAlert.severity.toUpperCase()}`,

@@ -4,6 +4,8 @@ import { predictCrowdDensity } from '@/ai/flows/predict-crowd-density';
 import { getLocationById } from '@/lib/data';
 import type { Alert } from '@/lib/types';
 import { z } from 'zod';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const analyzeDensitySchema = z.object({
   locationId: z.string(),
@@ -12,7 +14,7 @@ const analyzeDensitySchema = z.object({
 
 export async function analyzeDensityAction(
   formData: FormData
-): Promise<{ alert: Alert; newPeopleCount: number }> {
+): Promise<{ alert: Alert | null; newPeopleCount: number }> {
   const validatedFields = analyzeDensitySchema.safeParse({
     locationId: formData.get('locationId'),
     isProactive: formData.get('isProactive') === 'true',
@@ -43,14 +45,7 @@ export async function analyzeDensityAction(
      // For proactive checks, only trigger if it's getting close to the threshold
      // to avoid too many unnecessary alerts.
      return { 
-       alert: {
-         id: '',
-         locationName: '',
-         message: 'No alert',
-         severity: 'low',
-         recommendation: '',
-         timestamp: ''
-       }, 
+       alert: null, 
        newPeopleCount: currentPeople 
     };
   }
@@ -63,16 +58,27 @@ export async function analyzeDensityAction(
     peopleOut: location.peopleOut,
   });
 
-  const newAlert: Alert = {
-    id: crypto.randomUUID(),
+  const newAlert: Omit<Alert, 'id' | 'timestamp'> = {
     locationName: location.name,
     message: result.alert,
     severity: result.severity,
     recommendation: result.recommendation,
-    timestamp: new Date().toISOString(),
     prediction: result.prediction,
     audioAnnouncement: result.audioAnnouncement,
   };
 
-  return { alert: newAlert, newPeopleCount: currentPeople };
+  // Save to Firestore
+  const docRef = await addDoc(collection(db, 'crowd_alerts'), {
+    ...newAlert,
+    timestamp: serverTimestamp(),
+  });
+
+  return {
+    alert: {
+      ...newAlert,
+      id: docRef.id,
+      timestamp: new Date().toISOString(),
+    },
+    newPeopleCount: currentPeople,
+  };
 }
