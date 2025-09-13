@@ -19,7 +19,7 @@ import {
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { formatDuration } from '@/lib/utils';
-import RealTimeClock from './real-time-clock';
+import { useState, useEffect } from 'react';
 
 
 type LocationCardProps = {
@@ -34,6 +34,36 @@ export default function LocationCard({
   const isOverThreshold = currentPeople > threshold;
 
   const image = PlaceHolderImages.find((p) => p.id === cameraFeedImageId);
+
+  // Set initial countdown time in seconds
+  const getInitialTime = () => {
+    if (predictiveAlert?.prediction?.timeToThreshold && predictiveAlert.prediction.timeToThreshold > 0) {
+      return predictiveAlert.prediction.timeToThreshold * 60;
+    }
+    // Specific mock time for one location as requested
+    if (id === 'plaza-main') return 3600; // 1 hour static
+    // Default mock time for others
+    return 7200; // 2 hours
+  };
+
+  const [countdown, setCountdown] = useState(getInitialTime());
+
+  useEffect(() => {
+    // Only run the timer if it's not the static one and there's time left
+    if (id !== 'plaza-main' && countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prevCountdown) => (prevCountdown > 0 ? prevCountdown - 1 : 0));
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [countdown, id]);
+
+   useEffect(() => {
+    // Reset countdown if a new predictive alert comes in
+    setCountdown(getInitialTime());
+  }, [predictiveAlert]);
+
 
   const getProgressColor = () => {
     if (percentage > 90) return 'bg-destructive';
@@ -102,17 +132,14 @@ export default function LocationCard({
       </CardContent>
       <CardFooter>
         <div className="w-full text-center text-muted-foreground text-sm p-2 rounded-md bg-muted/50">
-             {predictiveAlert?.prediction?.timeToThreshold && predictiveAlert.prediction.timeToThreshold > 0 ? (
-                <div className="flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-400 font-bold">
-                    <Clock className="size-4" />
-                    <span>Threshold in {formatDuration(predictiveAlert.prediction.timeToThreshold * 60)}</span>
-                </div>
-            ) : (
-                <div className="flex items-center justify-center gap-2">
-                    <Clock className="size-4" />
-                    <span>No imminent threat</span>
-                </div>
-            )}
+             <div className="flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-400 font-bold">
+                <Clock className="size-4" />
+                 {countdown > 0 ? (
+                    <span>Threshold in {formatDuration(countdown)}</span>
+                 ) : (
+                    <span>Threshold Potentially Reached</span>
+                 )}
+            </div>
         </div>
       </CardFooter>
     </Card>

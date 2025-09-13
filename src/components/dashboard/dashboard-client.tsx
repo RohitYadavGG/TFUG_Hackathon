@@ -68,9 +68,7 @@ export default function DashboardClient({
   initialLocations: Location[];
 }) {
   const [locations, setLocations] = useState<Location[]>(initialLocations);
-  const [alerts, setAlerts] = useState<Alert[]>(initialMockAlerts);
   const [isPending, startTransition] = useTransition();
-  const [analyzingId, setAnalyzingId] = useState<string | null>(null);
   const { toast } = useToast();
   const [isProactiveMonitoring, setIsProactiveMonitoring] = useState(false);
   const [predictionData, setPredictionData] = useState<{
@@ -105,8 +103,6 @@ export default function DashboardClient({
           audioAnnouncement: data.audioAnnouncement,
         });
       });
-      // Prepend new alerts to any existing mock alerts
-      setAlerts(prevAlerts => [...alertsData, ...prevAlerts.filter(p => p.id.startsWith('mock-'))]);
     });
 
     return () => unsubscribe();
@@ -126,7 +122,7 @@ export default function DashboardClient({
 
         setLocations((prev) =>
             prev.map((l) =>
-              l.id === locationId ? { ...l, currentPeople: newPeopleCount } : l
+              l.id === locationId ? { ...l, currentPeople: newPeopleCount, predictiveAlert: newAlert } : l
             )
         );
 
@@ -135,13 +131,6 @@ export default function DashboardClient({
         if (newAlert && location) {
           const timeToThreshold = newAlert.prediction?.timeToThreshold ?? -1;
           const isPredictive = timeToThreshold > 0;
-
-          // Update location state with predictive alert
-          setLocations((prev) =>
-            prev.map((l) =>
-              l.id === locationId ? { ...l, predictiveAlert: newAlert } : l
-            )
-          );
 
           if (isPredictive && timeToThreshold <= 50) {
              setPredictiveAlert(newAlert);
@@ -170,10 +159,6 @@ export default function DashboardClient({
                 ? error.message
                 : 'An unknown error occurred.',
             });
-        }
-      } finally {
-        if (!isProactive) {
-          setAnalyzingId(null);
         }
       }
     });
