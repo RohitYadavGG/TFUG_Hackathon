@@ -15,6 +15,7 @@ import { Button } from '../ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import NotificationBell from './notification-bell';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 
 function getPageTitle(pathname: string) {
   if (pathname === '/') return 'Dashboard';
@@ -26,6 +27,7 @@ function getPageTitle(pathname: string) {
 export default function Header() {
   const pathname = usePathname();
   const pageTitle = getPageTitle(pathname);
+  const { logout } = useAuth();
 
   const userAvatar = PlaceHolderImages.find(p => p.id === 'user-avatar');
 
@@ -50,7 +52,7 @@ export default function Header() {
             <DropdownMenuItem asChild>
                 <Link href="/profile">Profile</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem onClick={logout} className="text-destructive focus:bg-destructive/10 focus:text-destructive">Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

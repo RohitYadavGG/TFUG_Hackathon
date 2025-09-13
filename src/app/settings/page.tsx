@@ -6,15 +6,15 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
+    <div>
         <h1 className="text-3xl font-bold font-headline">
-          Threshold Configuration
+        Threshold Configuration
         </h1>
         <p className="text-muted-foreground mt-2">
-          Set custom safety thresholds for different locations within the city.
+        Set custom safety thresholds for different locations within the city.
         </p>
-      </div>
-      <SettingsForm locations={locations} />
+    </div>
+    <SettingsForm locations={locations} />
     </div>
   );
 }
