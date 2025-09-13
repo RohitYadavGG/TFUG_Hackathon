@@ -3,7 +3,7 @@
 <h2>🔗 Live Demo</h2>
 <p>Check out the live demo of our <strong>Smart Crowd Safety System</strong> here:</p>
 
-<p><a href="[https://your-demo-link.com](https://studio--studio-3597331857-d1b09.us-central1.hosted.app/)" target="_blank" style="color:#1a73e8; font-weight:bold; text-decoration:none;">Click to View Live Demo</a></p>
+<p><a href="https://studio--studio-3597331857-d1b09.us-central1.hosted.app/" target="_blank" style="color:#1a73e8; font-weight:bold; text-decoration:none;">Click to View Live Demo</a></p>
 
 <h3>Demo Features</h3>
 <ul>
