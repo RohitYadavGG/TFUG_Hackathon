@@ -91,18 +91,27 @@ export default function LocationCard({
         <CardDescription>Live crowd monitoring</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
-        {image && (
-          <div className="aspect-video overflow-hidden rounded-md">
-            <Image
-              src={image.imageUrl}
-              alt={`Camera feed for ${name}`}
-              width={600}
-              height={400}
-              className="object-cover w-full h-full"
-              data-ai-hint={image.imageHint}
-            />
+        <div className="aspect-video overflow-hidden rounded-md">
+            {id === 'subway-station' ? (
+              <video
+                src="/people-crowd-at-metro.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="object-cover w-full h-full"
+              />
+            ) : image ? (
+              <Image
+                src={image.imageUrl}
+                alt={`Camera feed for ${name}`}
+                width={600}
+                height={400}
+                className="object-cover w-full h-full"
+                data-ai-hint={image.imageHint}
+              />
+            ) : null}
           </div>
-        )}
         <div className="space-y-4">
           <div>
             <div className="flex justify-between items-center mb-1 text-sm">

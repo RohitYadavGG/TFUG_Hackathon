@@ -17,7 +17,7 @@
       "id": "3",
       "description": "A bustling market street from an elevated view.",
       "imageUrl": "https://picsum.photos/seed/3/600/400",
-      "imageHint": "market street"
+      "imageHint": "waterfall nature"
     },
     {
       "id": "4",
@@ -39,15 +39,21 @@
     },
     {
       "id": "map",
-      "description": "A digital map of a city with highlighted points of interest.",
-      "imageUrl": "https://picsum.photos/seed/map/1200/800",
-      "imageHint": "city map"
+      "description": "An open book.",
+      "imageUrl": "https://picsum.photos/seed/book/1200/800",
+      "imageHint": "open book"
     },
     {
       "id": "user-avatar",
       "description": "A portrait of a person to be used as a user avatar.",
       "imageUrl": "https://picsum.photos/seed/user/40/40",
       "imageHint": "person portrait"
+    },
+    {
+      "id": "7",
+      "description": "Close up of red fruits at a market.",
+      "imageUrl": "https://picsum.photos/seed/7/600/400",
+      "imageHint": "red fruits"
     }
   ]
 }
