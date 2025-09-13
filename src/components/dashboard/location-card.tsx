@@ -43,12 +43,6 @@ export default function LocationCard({
 
   return (
     <Card className="flex flex-col relative overflow-hidden">
-        {predictiveAlert && predictiveAlert.prediction && predictiveAlert.prediction.timeToThreshold > 0 && (
-             <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-yellow-500/90 text-yellow-900 p-1.5 rounded-md text-xs font-bold animate-pulse">
-                <Clock className="size-4" />
-                <span>{formatDuration(predictiveAlert.prediction.timeToThreshold * 60)}</span>
-             </div>
-        )}
       <CardHeader>
         <CardTitle className="font-headline">{name}</CardTitle>
         <CardDescription>Live crowd monitoring</CardDescription>
@@ -109,9 +103,9 @@ export default function LocationCard({
       <CardFooter>
         <div className="w-full text-center text-muted-foreground text-sm p-2 rounded-md bg-muted/50">
              {predictiveAlert?.prediction?.timeToThreshold && predictiveAlert.prediction.timeToThreshold > 0 ? (
-                <div className="flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-400 font-bold animate-pulse">
+                <div className="flex items-center justify-center gap-2 text-yellow-600 dark:text-yellow-400 font-bold">
                     <Clock className="size-4" />
-                    <span>Threshold predicted in {formatDuration(predictiveAlert.prediction.timeToThreshold * 60)}</span>
+                    <span>Threshold in {formatDuration(predictiveAlert.prediction.timeToThreshold * 60)}</span>
                 </div>
             ) : (
                 <RealTimeClock />
