@@ -1,3 +1,53 @@
+
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "1",
+      "description": "Busy temple entrance with crowd of people.",
+      "imageUrl": "https://picsum.photos/seed/1/600/400",
+      "imageHint": "crowd temple"
+    },
+    {
+      "id": "2",
+      "description": "Wide-angle view of a city plaza with people walking.",
+      "imageUrl": "https://picsum.photos/seed/2/600/400",
+      "imageHint": "city plaza"
+    },
+    {
+      "id": "3",
+      "description": "A bustling market street from an elevated view.",
+      "imageUrl": "https://picsum.photos/seed/3/600/400",
+      "imageHint": "market street"
+    },
+    {
+      "id": "4",
+      "description": "People waiting on a subway platform.",
+      "imageUrl": "https://picsum.photos/seed/4/600/400",
+      "imageHint": "subway station"
+    },
+    {
+      "id": "5",
+      "description": "Entrance of a city park on a sunny day.",
+      "imageUrl": "https://picsum.photos/seed/5/600/400",
+      "imageHint": "park entrance"
+    },
+    {
+      "id": "6",
+      "description": "Interior of a large concert hall with audience.",
+      "imageUrl": "https://picsum.photos/seed/6/600/400",
+      "imageHint": "concert hall"
+    },
+    {
+      "id": "map",
+      "description": "A digital map of a city with highlighted points of interest.",
+      "imageUrl": "https://picsum.photos/seed/map/1200/800",
+      "imageHint": "city map"
+    },
+    {
+      "id": "user-avatar",
+      "description": "A portrait of a person to be used as a user avatar.",
+      "imageUrl": "https://picsum.photos/seed/user/40/40",
+      "imageHint": "person portrait"
+    }
+  ]
 }
