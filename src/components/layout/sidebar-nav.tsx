@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Settings } from 'lucide-react';
+import { LayoutDashboard, Settings, User } from 'lucide-react';
 
 import {
   SidebarHeader,
@@ -18,6 +18,7 @@ import { Separator } from '@/components/ui/separator';
 const menuItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/profile', label: 'Profile', icon: User },
 ];
 
 export default function SidebarNav() {

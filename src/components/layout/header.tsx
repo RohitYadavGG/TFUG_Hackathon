@@ -14,10 +14,12 @@ import {
 import { Button } from '../ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import NotificationBell from './notification-bell';
+import Link from 'next/link';
 
 function getPageTitle(pathname: string) {
   if (pathname === '/') return 'Dashboard';
   if (pathname.startsWith('/settings')) return 'Settings';
+  if (pathname.startsWith('/profile')) return 'Profile';
   return 'SmartGuard';
 }
 
@@ -45,7 +47,9 @@ export default function Header() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Safety Admin</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link href="/profile">Profile</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Logout</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
